@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from src.utils.db_reqs import create_QuizDB, get_Quiz
+from src.utils.db_reqs import create_QuizDB, get_Quiz, create_PeopleDB
 from src.utils.logger import Logger
 
 log = Logger()
@@ -9,6 +9,7 @@ log = Logger()
 async def lifespan(app: FastAPI):
     try:
         create_QuizDB()
+        create_PeopleDB()
         log.info("dbs created")
         yield
     finally:
@@ -22,6 +23,7 @@ app = FastAPI(
 )
 # Solo para desarrollo
 origins = ["*"]
+# origins = ["https://satellite-quiz.vercel.app/", "localhost", "127.0.0.1"]
 
 app.add_middleware(
     CORSMiddleware,

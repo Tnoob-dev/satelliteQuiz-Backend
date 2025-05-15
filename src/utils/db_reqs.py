@@ -11,21 +11,21 @@ class Questions(SQLModel, table = True):
     difficult: str = Field(default=None)
     points: int = Field(default=None)
 
-dbsqlite_path = "src/core/quiz.db"
+quiz_sqlite_path = "src/core/quiz.db"
 json_path = "src/core/quiz.json"
-db = f"sqlite:///{dbsqlite_path}"
-engine = create_engine(db)
+quiz_dbsqlite = f"sqlite:///{quiz_sqlite_path}"
+quiz_sqlite_engine = create_engine(quiz_dbsqlite)
 
 def create_QuizDB() -> None:
     # Chequeamos que la DB exista, en caso de que no exista, la creamos y le metemos todas las preguntas dentro
-    if not os.path.exists(dbsqlite_path):
-        Questions.metadata.create_all(engine)
+    if not os.path.exists(quiz_sqlite_path):
+        Questions.metadata.create_all(quiz_sqlite_engine)
         
         if os.path.exists(json_path):
             with open(json_path, "r", encoding="utf-8") as file:
                 data = json.load(file)    
                 
-                with Session(engine) as session:
+                with Session(quiz_sqlite_engine) as session:
                     for questions in data:
                         session.add(Questions(question=questions["question"],
                                             answers=questions["answers"],
@@ -40,7 +40,7 @@ def create_QuizDB() -> None:
         
 def get_Quiz() -> List[Dict[str, Any]]:
     questions = []
-    with Session(engine) as session:
+    with Session(quiz_sqlite_engine) as session:
         counter = 1
         
         while counter <= 20:
@@ -62,3 +62,16 @@ def get_Quiz() -> List[Dict[str, Any]]:
             counter += 1
         
     return questions
+
+class People(SQLModel, table = True):
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(default=None)
+    points: int = Field(default=0)
+    
+people_sqlite_path = "src/core/people.db"
+people_db = f"sqlite:///{people_sqlite_path}"
+people_sqlite_engine = create_engine(people_db)
+
+def create_PeopleDB() -> None:
+    if not os.path.exists(people_sqlite_path):
+        People.metadata.create_all(people_sqlite_engine)
