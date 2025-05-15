@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from src.utils.db_reqs import create_QuizDB, get_Quiz, create_PeopleDB
+from src.utils.sqlite_db_reqs import create_QuizDB, get_Quiz
+from src.utils.postgre_db_reqs import create_PeopleDB
 from src.utils.logger import Logger
 
 log = Logger()

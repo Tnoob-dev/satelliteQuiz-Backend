@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Column, JSON, Field, create_engine, select, Session
 from typing import List, Dict, Any
-import os, json
+import os, json, dotenv
 
 class Questions(SQLModel, table = True):
     id: int = Field(default=None, primary_key=True)
@@ -19,7 +19,9 @@ quiz_sqlite_engine = create_engine(quiz_dbsqlite)
 def create_QuizDB() -> None:
     # Chequeamos que la DB exista, en caso de que no exista, la creamos y le metemos todas las preguntas dentro
     if not os.path.exists(quiz_sqlite_path):
-        Questions.metadata.create_all(quiz_sqlite_engine)
+        for table in SQLModel.metadata.tables.values():
+            if table.name != "people":
+                table.create(quiz_sqlite_engine)
         
         if os.path.exists(json_path):
             with open(json_path, "r", encoding="utf-8") as file:
@@ -62,16 +64,3 @@ def get_Quiz() -> List[Dict[str, Any]]:
             counter += 1
         
     return questions
-
-class People(SQLModel, table = True):
-    id: int = Field(default=None, primary_key=True)
-    name: str = Field(default=None)
-    points: int = Field(default=0)
-    
-people_sqlite_path = "src/core/people.db"
-people_db = f"sqlite:///{people_sqlite_path}"
-people_sqlite_engine = create_engine(people_db)
-
-def create_PeopleDB() -> None:
-    if not os.path.exists(people_sqlite_path):
-        People.metadata.create_all(people_sqlite_engine)
