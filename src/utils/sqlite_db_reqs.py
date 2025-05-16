@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Column, JSON, Field, create_engine, select, Session
 from typing import List, Dict, Any
-import os, json, dotenv
+import os, json
 
 class Questions(SQLModel, table = True):
     id: int = Field(default=None, primary_key=True)
