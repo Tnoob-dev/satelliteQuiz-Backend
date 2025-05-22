@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field, create_engine, select, Session
 import os, dotenv
 from fastapi import status
+from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
 
 dotenv.load_dotenv("./src/core/.env")
@@ -31,7 +32,7 @@ def insert_people(name: str) -> str:
                 session.add(People(name=name))
                 session.commit()
                 
-                return "User added"
+                JSONResponse({"message": "User added"}, status_code=status.HTTP_201_CREATED)
             except Exception as e:
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
 
@@ -69,7 +70,7 @@ def updatePoints(name: str, points: int) -> str:
                     
                     session.refresh(person)
                     
-                    return "Points added"
+                    JSONResponse({"message": "Points updated"}, status_code=status.HTTP_200_OK)
             except Exception as e:
                 session.rollback()
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))

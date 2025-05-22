@@ -59,18 +59,9 @@ async def get_all_people():
     
 @app.post("/add_people/{name}")
 async def add_people(name: str):
-    try:
-        msg = insert_people(name)
-        return JSONResponse({"message": msg}, status_code=status.HTTP_201_CREATED)
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
+    insert_people(name)
+    
 
 @app.put("/update_points")
 async def update_points(name: str, points: int):
-    try:
-        msg = updatePoints(name, points)
-        return JSONResponse({"message": msg}, status_code=status.HTTP_200_OK)
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
+    updatePoints(name, points)
