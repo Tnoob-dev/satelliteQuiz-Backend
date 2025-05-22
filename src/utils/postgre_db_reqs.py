@@ -25,7 +25,7 @@ def insert_people(name: str) -> str:
         person = session.exec(statement).first()
         
         if person:
-            return "Already exists a user with that name"
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str("Already exists a user with that name"))
         else:
             try:
                 session.add(People(name=name))
@@ -54,14 +54,16 @@ def updatePoints(name: str, points: int) -> str:
         if not person:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
         else:
-            try:
-                if person.points >= 100:
-                    person.points = 100
-                
+            try:                
                 if person.points == 100:
                     return {"User already have maximum points"}
                 elif person.points < 100 and person.points > 0:
-                
+                    
+                    person.points += points
+                        
+                    if person.points >= 100:
+                        person.points = 100
+                        
                     session.add(person)
                     session.commit()
                     
