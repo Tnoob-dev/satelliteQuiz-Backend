@@ -21,17 +21,20 @@ def create_PeopleDB() -> None:
         
 def insert_people(name: str) -> str:
     with Session(people_postgre_engine) as session:
+        statement = select(People).where(People.name == name)
+        person = session.exec(statement).first()
         
-        try:
-            session.add(People(name=name))
-            session.commit()
-            
-            return "User added"
-        except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
+        if person:
+            return "Already exists a user with that name"
+        else:
+            try:
+                session.add(People(name=name))
+                session.commit()
+                
+                return "User added"
+            except Exception as e:
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
 
-                            ### PENDIENTE ###
-############ DEVOLVER LOS USUARIOS DEPENDIENDO DE QUIEN TENGA MAS PUNTOS ############
 def get_People():
     people = []
     
@@ -46,20 +49,25 @@ def get_People():
 def updatePoints(name: str, points: int) -> str:
     with Session(people_postgre_engine) as session:
         statement = select(People).where(People.name == name)
-        person = session.exec(statement).one()
+        person = session.exec(statement).first()
         
         if not person:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
         else:
             try:
-                person.points += points
+                if person.points >= 100:
+                    person.points = 100
                 
-                session.add(person)
-                session.commit()
+                if person.points == 100:
+                    return {"User already have maximum points"}
+                elif person.points < 100 and person.points > 0:
                 
-                session.refresh(person)
-                
-                return "Points added"
+                    session.add(person)
+                    session.commit()
+                    
+                    session.refresh(person)
+                    
+                    return "Points added"
             except Exception as e:
                 session.rollback()
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
