@@ -22,19 +22,14 @@ def create_PeopleDB() -> None:
         
 def insert_people(name: str) -> str:
     with Session(people_postgre_engine) as session:
-        statement = select(People).where(People.name == name)
-        person = session.exec(statement).first()
-        
-        if person:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str("Already exists a user with that name"))
-        else:
-            try:
-                session.add(People(name=name))
-                session.commit()
-                
-                JSONResponse({"message": "User added"}, status_code=status.HTTP_201_CREATED)
-            except Exception as e:
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
+
+        try:
+            session.add(People(name=name))
+            session.commit()
+            
+            JSONResponse({"message": "User added"}, status_code=status.HTTP_201_CREATED)
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(f"Error -> {e}"))
 
 def get_People():
     people = []
